@@ -37,28 +37,32 @@
            class="input-container"
       >
         <label class="label" for="day-select">День недели</label>
-        <dx-select-box v-model="selectedDayOfWeek"
+        <dx-tag-box v-model="selectedDaysOfWeek"
                      :items="dayOfWeekOptions"
                      id="day-select"
                      placeholder=""
                      :showClearButton="true"
                      :acceptCustomValue="false"
-                     :valueExpr="'value'"
+                     :showSelectionControls="true"
+                     :multiTag="true"
+                     :valueExpr="'name'"
                      :displayExpr="'name'"
+                     :dropDownOptions="{minWidth: 200}"
                      :onValueChanged="onDayOfWeekChange"
         >
-        </dx-select-box>
+        </dx-tag-box>
       </div>
 
-      <div class="input-container">
-        <label class="label" for="time-select">Время</label>
-        <input type="time"
+
+    </div>
+    <div class="input-container">
+      <label class="label" for="time-select">Время</label>
+      <input type="time"
              v-model="selectedTime"
              id="time-select"
              placeholder="Выберите время"
              @onValueChanged="onTimeChange"
-        >
-      </div>
+      >
     </div>
 
     <div>
@@ -73,6 +77,7 @@ import 'devextreme/dist/css/dx.light.css';
 import DxSelectBox from 'devextreme-vue/select-box';
 import DxDateBox from 'devextreme-vue/date-box';
 import DxButton from 'devextreme-vue/button';
+import DxTagBox from "devextreme-vue/tag-box";
 // import DxValidator, {
 //   DxRequiredRule,
 //   DxPatternRule
@@ -83,25 +88,26 @@ export default {
     DxSelectBox,
     DxDateBox,
     DxButton,
+    DxTagBox
   },
   data() {
     return {
       selectedTeam: null,
       selectedFrequency: null,
       selectedDate: null,
-      selectedDayOfWeek: null,
+      selectedDaysOfWeek: [],
       selectedTime: null,
       currentDate: new Date(),
       teamOptions: ['Analize', 'Vacuum'],
       frequencyOptions: ['Регулярно', 'Однократно'],
       dayOfWeekOptions: [
-        { name: 'Понедельник', value: 1 },
-        { name: 'Вторник', value: 2 },
-        { name: 'Среда', value: 3 },
-        { name: 'Четверг', value: 4 },
-        { name: 'Пятница', value: 5 },
-        { name: 'Суббота', value: 6 },
-        { name: 'Воскресенье', value: 0 }
+        { name: 'Понедельник'},
+        { name: 'Вторник'},
+        { name: 'Среда'},
+        { name: 'Четверг'},
+        { name: 'Пятница'},
+        { name: 'Суббота'},
+        { name: 'Воскресенье'}
       ]
     };
   },
@@ -111,10 +117,8 @@ export default {
         this.selectedDayOfWeek = null;
       }
     },
-    onDayOfWeekChange(value) {
-      if (value && this.selectedDate) {
-        this.selectedDate = null;
-      }
+    onDayOfWeekChange(event) {
+      this.selectedDaysOfWeek = event.value
     },
     onTimeChange() {
 
