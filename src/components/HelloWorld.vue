@@ -21,12 +21,13 @@
 
     <div class="date-input-block">
 
-      <div class="input-container">
+      <div class="input-container flat">
       <label class="label" for="date-select">Дата</label>
       <dx-date-box v-model="selectedDate"
                    type="date"
                    id="date-select"
                    :min="currentDate"
+                   :width="110"
                    :acceptCustomValue="false"
                    :onValueChanged="onDateChange"
       >
@@ -34,7 +35,7 @@
       </div>
 
       <div v-if="selectedFrequency === 'Регулярно'"
-           class="input-container"
+           class="input-container flat"
       >
         <label class="label" for="day-select">День недели</label>
         <dx-tag-box v-model="selectedDaysOfWeek"
@@ -51,13 +52,14 @@
                      :multiline="false"
                      :dropDownOptions="{minWidth: 150}"
                      :onValueChanged="onDayOfWeekChange"
+                     :style="'min-width: 110px'"
         >
         </dx-tag-box>
       </div>
 
 
     </div>
-    <div class="input-container">
+    <div class="input-container flat">
       <label class="label" for="time-select">Время</label>
       <input type="time"
              class="time-input"
@@ -168,5 +170,9 @@ export default {
 .time-input {
   width: 68px;
   height: 25px;
+}
+.flat {
+  flex-direction: row;
+  align-items: center;
 }
 </style>
