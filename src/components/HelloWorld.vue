@@ -47,7 +47,9 @@
                      :multiTag="true"
                      :valueExpr="'name'"
                      :displayExpr="'name'"
-                     :dropDownOptions="{minWidth: 200}"
+                     :max-displayed-tags="3"
+                     :multiline="false"
+                     :dropDownOptions="{minWidth: 150}"
                      :onValueChanged="onDayOfWeekChange"
         >
         </dx-tag-box>
@@ -58,6 +60,7 @@
     <div class="input-container">
       <label class="label" for="time-select">Время</label>
       <input type="time"
+             class="time-input"
              v-model="selectedTime"
              id="time-select"
              placeholder="Выберите время"
@@ -161,5 +164,9 @@ export default {
 .label {
   font-size: 13px;
   opacity: 0.7;
+}
+.time-input {
+  width: 68px;
+  height: 25px;
 }
 </style>
