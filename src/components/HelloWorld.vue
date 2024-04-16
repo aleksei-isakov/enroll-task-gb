@@ -25,9 +25,12 @@
       <label class="label" for="date-select">Дата</label>
       <dx-date-box v-model="selectedDate"
                    type="date"
+                   :onOpened="onDateBoxDropDownOpen"
                    id="date-select"
                    :min="currentDate"
                    :width="110"
+                   :showTodayButton="false"
+                   :applyValueMode="'useButtons'"
                    :acceptCustomValue="false"
                    :onValueChanged="onDateChange"
       >
@@ -137,6 +140,10 @@ export default {
       this.selectedDate = null;
       this.selectedDayOfWeek = null;
       this.selectedTime = null;
+    },
+    onDateBoxDropDownOpen() {
+      const todayButtons = document.querySelectorAll('.dx-button-today')
+      todayButtons.forEach(el => el.style.display = 'none')
     }
   },
   computed: {
