@@ -22,13 +22,18 @@
     <div class="date-input-block">
 
       <div class="input-container flat">
-      <label class="label" for="date-select">Дата</label>
+      <label class="label" for="date-select">Дата
+        <span v-show="selectedDaysOfWeek.length && !selectedDate"
+              class="red-star"
+        >*</span>
+      </label>
       <dx-date-box v-model="selectedDate"
                    type="date"
                    :onOpened="onDateBoxDropDownOpen"
                    id="date-select"
                    :min="currentDate"
                    :width="110"
+                   :is-valid="isFieldsValid || selectedDate"
                    :showTodayButton="false"
                    :applyValueMode="'useButtons'"
                    :acceptCustomValue="false"
@@ -40,7 +45,11 @@
       <div v-if="selectedFrequency === 'Регулярно'"
            class="input-container flat"
       >
-        <label class="label" for="day-select">День недели</label>
+        <label class="label" for="day-select">День недели
+          <span v-show="selectedDate && !selectedDaysOfWeek.length"
+                class="red-star"
+          >*</span>
+        </label>
         <dx-tag-box v-model="selectedDaysOfWeek"
                      :items="dayOfWeekOptions"
                      id="day-select"
@@ -52,8 +61,10 @@
                      :valueExpr="'name'"
                      :displayExpr="'name'"
                      :max-displayed-tags="3"
+                     :is-valid="selectedDaysOfWeek.length || isFieldsValid"
                      :multiline="false"
-                     :dropDownOptions="{minWidth: 150}"
+                     :applyValueMode="'useButtons'"
+                     :dropDownOptions="{minWidth: 250}"
                      :onValueChanged="onDayOfWeekChange"
                      :style="'min-width: 110px'"
         >
@@ -64,13 +75,16 @@
     </div>
     <div class="input-container flat">
       <label class="label" for="time-select">Время</label>
-      <input type="time"
+      <dx-date-box
+             type="time"
              class="time-input"
              v-model="selectedTime"
              id="time-select"
-             placeholder="Выберите время"
+             placeholder=""
+             :acceptCustomValue="false"
              @onValueChanged="onTimeChange"
-      >
+             :is-valid="selectedTime || isFieldsValid"
+      />
     </div>
 
     <div>
@@ -106,6 +120,7 @@ export default {
       selectedDaysOfWeek: [],
       selectedTime: null,
       currentDate: new Date(),
+      isFieldsValid: true,
       teamOptions: ['Analize', 'Vacuum'],
       frequencyOptions: ['Регулярно', 'Однократно'],
       dayOfWeekOptions: [
@@ -132,13 +147,13 @@ export default {
 
     },
     validateAndSave() {
-      const isValid = this.selectedFrequency === 'Однократно' ? this.selectedDate && this.selectedTime : this.selectedDate && this.selectedDayOfWeek && this.selectedTime;
-      isValid ? alert('Данные успешно сохранены') : alert('Неверно заполненные поля')
+      this.isFieldsValid = this.selectedFrequency === 'Однократно' ? this.selectedDate && this.selectedTime : this.selectedDate && this.selectedDaysOfWeek.length && this.selectedTime;
+      this.isFieldsValid ? alert('Данные успешно сохранены') : alert('Неверно заполненные поля')
     },
     clearForm() {
       this.selectedFrequency = null;
       this.selectedDate = null;
-      this.selectedDayOfWeek = null;
+      this.selectedDaysOfWeek = [];
       this.selectedTime = null;
     },
     onDateBoxDropDownOpen() {
@@ -146,9 +161,6 @@ export default {
       todayButtons.forEach(el => el.style.display = 'none')
     }
   },
-  computed: {
-      // тут будут валидаторы //
-  }
 };
 </script>
 
@@ -175,11 +187,14 @@ export default {
   opacity: 0.7;
 }
 .time-input {
-  width: 68px;
-  height: 25px;
+  width: 100px;
+  height: 35px;
 }
 .flat {
   flex-direction: row;
   align-items: center;
+}
+.red-star {
+  color: red;
 }
 </style>
