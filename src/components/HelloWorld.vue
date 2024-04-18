@@ -129,7 +129,6 @@ export default {
       formItemsLexemes,
       formItemsTitles,
       formData,
-      foraaa: {},
       formDataObject,
       formInst: null,
       teamSelectBoxOptions: {
