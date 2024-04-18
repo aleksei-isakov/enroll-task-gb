@@ -1,12 +1,15 @@
 <template>
   <div>
+    <form @submit="validateAndSave">
   <dx-form @initialized="onFormInit"
            @field-data-changed="formFieldDataChanged"
+           :form-data="formDataObject"
   >
     <dx-simple-item editor-type="dxSelectBox"
                   :name="formItemsTitles.teamSelectTitle"
                   :data-field="formItemsTitles.teamSelectTitle"
                   :editor-options="teamSelectBoxOptions"
+                  :is-required="true"
       >
       <dx-label :text="formItemsLexemes.teamSelectName" />
     </dx-simple-item>
@@ -15,7 +18,6 @@
                   :name="formItemsTitles.regularitySelectTitle"
                   :data-field="formItemsTitles.regularitySelectTitle"
                   :editor-options="regularitySelectBoxOptions"
-                  :is-required="true"
     >
       <dx-label :text="formItemsLexemes.regularitySelectName" />
     </dx-simple-item>
@@ -53,27 +55,21 @@
       <dx-label location="left" :text="formItemsLexemes.timeSelectName" />
     </dx-simple-item>
 
-<!--    <DxSimpleItem data-field="selectedFrequency"-->
-<!--                  editor-type="dxSelectBox"-->
-<!--                  :editor-options="frequencyEditorOptions"-->
-<!--    />-->
-<!--    <DxSimpleItem data-field="selectedDate" editor-type="dxDateBox" :editor-options="dateEditorOptions" />-->
-<!--    <DxSimpleItem data-field="selectedDaysOfWeek" editor-type="dxTagBox" :editor-options="dayOfWeekEditorOptions" />-->
-<!--    <DxSimpleItem data-field="selectedTime" editor-type="dxDateBox" :editor-options="timeEditorOptions" />-->
-    <div>
-      <dx-simple-item text="Сохранить" editor-type="dxButton" type="submit" @click="validateAndSave" />
-      <dx-simple-item text="Отмена" @click="clearForm" />
-    </div>
+      <dx-button-item
+                 :button-options="submitButtonOptions"
+      />
+      <dx-button-item @click="clear" :button-options="submitButtonOptions2" />
+
   </dx-form>
+    </form>
     <FunctionTest/>
   </div>
 </template>
 
 <script>
 import 'devextreme/dist/css/dx.light.css';
-import { DxForm, DxSimpleItem, DxLabel } from 'devextreme-vue/form';
+import { DxForm, DxSimpleItem, DxLabel, DxButtonItem } from 'devextreme-vue/form';
 import FunctionTest from "@/components/FunctionTest.vue";
-// import DxButton from "devextreme-vue/button";
 
 const formItemsLexemes = {
   teamSelectName: 'Выберите команду',
@@ -84,7 +80,7 @@ const formItemsLexemes = {
 }
 const formItemsTitles = {
   teamSelectTitle: 'teamSelect',
-  regularitySelectTitle: 'regularitySelect',
+  regularitySelectTitle: 'isRegular',
   dateSelectTitle: 'dateSelect',
   timeSelectTitle: 'timeSelect',
   daySelectTitle: 'daySelect'
@@ -100,10 +96,10 @@ const formData = {
   ],
   regularitySelectOptions: [
     {
-      value: 'single', name: 'Однократно'
+      value: false, name: 'Однократно'
     },
     {
-      value: 'regular', name: 'Регулярно'
+      value: true, name: 'Регулярно'
     }
   ],
   daysSelectOptions: [
@@ -117,6 +113,7 @@ const formData = {
   ]
 }
 
+const formDataObject = {}
 
 export default {
   components: {
@@ -124,24 +121,36 @@ export default {
     DxForm,
     DxSimpleItem,
     DxLabel,
-    // DxButton
+    DxButtonItem
   },
   data() {
     return {
+      isRegularly: false,
       formItemsLexemes,
       formItemsTitles,
       formData,
+      foraaa: {},
+      formDataObject,
       formInst: null,
       teamSelectBoxOptions: {
         items: formData.teamSelectOptions,
         displayExpr: "name",
+        valueExpr: "value",
         width: '50%'
+      },
+      submitButtonOptions: {
+        text: "Submit the Form",
+        useSubmitBehavior: true
+      },
+      submitButtonOptions2: {
+        text: "Clear the Form",
+        onClick: this.clear
       },
       regularitySelectBoxOptions: {
         items: formData.regularitySelectOptions,
         displayExpr: "name",
         valueExpr: 'value',
-        width: '50%'
+        width: '50%',
       },
       dateBoxOptionsDate: {
         width: '50%',
@@ -179,66 +188,14 @@ export default {
       },
     };
   },
-  // computed: {
-  //   teamEditorOptions() {
-  //     return { items: this.teamOptions };
-  //   },
-  //   frequencyEditorOptions() {
-  //     return { items: this.frequencyOptions.map(option => option.name) };
-  //   },
-  //   dayOfWeekEditorOptions() {
-  //     return {
-  //       items: this.dayOfWeekOptions.map(option => option.name),
-  //       showClearButton: true,
-  //       acceptCustomValue: false,
-  //       showSelectionControls: true,
-  //       multiTag: true,
-  //       valueExpr: 'name',
-  //       displayExpr: 'name',
-  //       maxDisplayedTags: 3,
-  //       isValid: this.formData.selectedDaysOfWeek.length || this.isFieldsValid,
-  //       multiline: false,
-  //       applyValueMode: 'useButtons',
-  //       dropDownOptions: { minWidth: 250 },
-  //       style: 'min-width: 110px'
-  //     };
-  //   },
-  //   dateEditorOptions() {
-  //     return {
-  //       type: 'date',
-  //       onOpened: this.onDateBoxDropDownOpen,
-  //       min: new Date(),
-  //       width: 110,
-  //       isValid: this.isFieldsValid || this.formData.selectedDate,
-  //       showTodayButton: false,
-  //       applyValueMode: 'useButtons',
-  //       acceptCustomValue: false,
-  //       onValueChanged: this.onDateChange
-  //     };
-  //   },
-  //   timeEditorOptions() {
-  //     return {
-  //       type: 'time',
-  //       class: 'time-input',
-  //       isValid: this.formData.selectedTime || this.isFieldsValid,
-  //       acceptCustomValue: false,
-  //       onValueChanged: this.onTimeChange
-  //     };
-  //   }
-  // },
   methods: {
-    onDateChange(value) {
-      if (value && this.formData.selectedDaysOfWeek.length) {
-        this.formData.selectedDaysOfWeek = [];
-      }
-    },
     centerDropDownContent(e) {
       const dropDownContent = e.component.content();
       dropDownContent.style.textAlign = 'center';
     },
     onFormInit({ component }) {
-      this.formInst = component;
-      this.formInst.updateData('a', 'b');
+      // this.formInst = component;
+      // this.formInst.updateData('a', 'b');
       console.log(component, this.formInst);
     },
     onDateBoxDropDownOpen() {
@@ -246,13 +203,18 @@ export default {
       todayButtons.forEach(el => el.style.display = 'none');
     },
     formFieldDataChanged(event) {
-      console.log('formFieldChanged ' + event.dataField);
+
+      switch (event.dataField) {
+        case 'regularitySelect': this.isRegularly = event.value
+      }
+      this.formDataObject = event.component.option("formData")
+      console.log(this.formDataObject, 'formdata', this.foraaa);
     },
-    validateAndSave() {
-      // Логика для сохранения данных формы
+    validateAndSave(e) {
+      e.preventDefault()
     },
-    clearForm() {
-      // Логика для очистки данных формы
+    clear() {
+      this.formDataObject = {}
     }
   }
 };
