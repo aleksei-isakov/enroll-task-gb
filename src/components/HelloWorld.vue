@@ -58,7 +58,7 @@
       <dx-button-item
                  :button-options="submitButtonOptions"
       />
-      <dx-button-item @click="clear" :button-options="submitButtonOptions2" />
+      <dx-button-item @click="clear" :button-options="clearButtonOptions" />
 
   </dx-form>
     </form>
@@ -70,6 +70,7 @@
 import 'devextreme/dist/css/dx.light.css';
 import { DxForm, DxSimpleItem, DxLabel, DxButtonItem } from 'devextreme-vue/form';
 import FunctionTest from "@/components/FunctionTest.vue";
+import Vue from 'vue';
 
 const formItemsLexemes = {
   teamSelectName: 'Выберите команду',
@@ -130,6 +131,8 @@ export default {
       formItemsTitles,
       formData,
       formDataObject,
+      dateBoxOptionsBackup: {},
+      dayBoxOptionsBackup: {},
       formInst: null,
       teamSelectBoxOptions: {
         items: formData.teamSelectOptions,
@@ -141,7 +144,7 @@ export default {
         text: "Submit the Form",
         useSubmitBehavior: true
       },
-      submitButtonOptions2: {
+      clearButtonOptions: {
         text: "Clear the Form",
         onClick: this.clear
       },
@@ -156,6 +159,7 @@ export default {
         min: new Date(),
         applyValueMode: "useButtons",
         acceptCustomValue: false,
+        placeholder: '',
         onOpened: this.onDateBoxDropDownOpen
       },
       dateBoxOptionsTime: {
@@ -181,8 +185,9 @@ export default {
         displayExpr: "name",
         valueExpr: 'value',
         width: '50%',
+        placeholder: '',
         applyValueMode: "useButtons",
-        acceptCustomValue: "false",
+        acceptCustomValue: false,
         showSelectionControls: "true",
       },
     };
@@ -193,7 +198,9 @@ export default {
       dropDownContent.style.textAlign = 'center';
     },
     onFormInit({ component }) {
-      // this.formInst = component;
+      this.formInst = component;
+      this.dayBoxOptionsBackup = JSON.parse(JSON.stringify(this.dayBoxOptions))
+      this.dateBoxOptionsBackup = JSON.parse(JSON.stringify(this.dateBoxOptionsDate))
       // this.formInst.updateData('a', 'b');
       console.log(component, this.formInst);
     },
@@ -202,19 +209,54 @@ export default {
       todayButtons.forEach(el => el.style.display = 'none');
     },
     formFieldDataChanged(event) {
-
       switch (event.dataField) {
-        case 'regularitySelect': this.isRegularly = event.value
+        case 'isRegular':
+          this.isRegularly = event.value
+          break
       }
+
+      if (this.isRegularly && !!this.formDataObject.dateSelect) {
+        console.log('dateSelected');
+        this.processDaySelect('dateSelected')
+        }
+      if (this.isRegularly && !!this.formDataObject.daySelect) {
+        console.log('daySelected');
+        this.processDaySelect('daySelected')
+      }
+
       this.formDataObject = event.component.option("formData")
-      console.log(this.formDataObject, 'formdata');
+      console.log(this.formDataObject, 'formdata', event);
     },
     validateAndSave(e) {
       e.preventDefault()
     },
     clear() {
-      this.formDataObject = {}
-    }
+      this.formInst.resetValues()
+      Vue.set(this, 'dayBoxOptions', this.dayBoxOptionsBackup);
+      Vue.set(this, 'dateBoxOptionsDate', this.dateBoxOptionsBackup);
+    },
+    processDaySelect(type) {
+      if (type === 'dateSelected') {
+        const updatedOptions = Object.assign({}, this.dayBoxOptions,
+          {
+            placeholder: '*',
+            disabled: true,
+          }
+        );
+        this.formDataObject.daySelect = ''
+        Vue.set(this, 'dayBoxOptions', updatedOptions);
+      }
+      if (type === 'daySelected') {
+        const updatedOptions = Object.assign({}, this.dateBoxOptionsDate,
+          {
+            placeholder: '*',
+            disabled: true,
+          }
+        );
+        this.formDataObject.dateSelect = ''
+        Vue.set(this, 'dateBoxOptionsDate', updatedOptions);
+      }
+    },
   }
 };
 </script>
