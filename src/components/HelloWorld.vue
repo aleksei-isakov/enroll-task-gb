@@ -207,7 +207,7 @@ export default {
         case 'regularitySelect': this.isRegularly = event.value
       }
       this.formDataObject = event.component.option("formData")
-      console.log(this.formDataObject, 'formdata', this.foraaa);
+      console.log(this.formDataObject, 'formdata');
     },
     validateAndSave(e) {
       e.preventDefault()
