@@ -9,7 +9,6 @@
                   :name="formItemsTitles.teamSelectTitle"
                   :data-field="formItemsTitles.teamSelectTitle"
                   :editor-options="teamSelectBoxOptions"
-                  :is-required="true"
       >
       <dx-label :text="formItemsLexemes.teamSelectName" />
     </dx-simple-item>
@@ -209,11 +208,10 @@ export default {
       todayButtons.forEach(el => el.style.display = 'none');
     },
     formFieldDataChanged(event) {
-      switch (event.dataField) {
-        case 'isRegular':
-          this.isRegularly = event.value
-          break
-      }
+
+     if (event.dataField === 'isRegular') {
+       this.isRegularly = event.value
+     }
 
       if (this.isRegularly && !!this.formDataObject.dateSelect) {
         console.log('dateSelected');
@@ -225,7 +223,7 @@ export default {
       }
 
       this.formDataObject = event.component.option("formData")
-      console.log(this.formDataObject, 'formdata', event);
+
     },
     validateAndSave(e) {
       e.preventDefault()
